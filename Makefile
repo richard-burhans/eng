@@ -129,6 +129,8 @@ ifeq ($(shell uname -s),SunOS)
 endif
 
 ifeq ($(shell uname -s),SunOS)
+	CTF_TARGETS =		helloctf
+	CTF_TEST_TARGETS =	test_ctf
 	include ./tools/mk/Makefile.ctf.defs
 endif
 
@@ -170,7 +172,7 @@ all: $(SMF_MANIFESTS) $(STAMP_NODE_MODULES) $(GO_TARGETS) | $(REPO_DEPS)
 manpages: $(MAN_OUTPUTS)
 
 .PHONY: test
-test: $(STAMP_NODE_MODULES) $(GO_TEST_TARGETS)
+test: $(STAMP_NODE_MODULES) $(GO_TEST_TARGETS) $(TEST_CTF_TARGETS)
 	$(NODE) $(TAPE) test/*.test.js
 
 #
@@ -197,7 +199,11 @@ $(HELLOCTF_OBJDIR)/%.o: src/%.c
 	@mkdir -p $(@D)
 	gcc -o $@ -c $(HELLOCTF_CFLAGS) $<
 
-CLEAN_FILES += tmp/helloctf.obj helloctf
+CLEAN_FILES += $(HELLOCTF_OBJDIR) helloctf
+
+.PHONY: test_ctf
+test_ctf: helloctf $(STAMP_CTF_TOOLS)
+	src/testctf.sh cache/ctftools/bin/ctfdump ./helloctf
 
 #
 # Target definitions.  This is where we include the target Makefiles for
