@@ -128,6 +128,10 @@ ifeq ($(shell uname -s),SunOS)
 	include ./tools/mk/Makefile.go_prebuilt.defs
 endif
 
+ifeq ($(shell uname -s),SunOS)
+	include ./tools/mk/Makefile.ctf.defs
+endif
+
 #
 # Makefile.node_modules.defs provides a common target for installing modules
 # with NPM from a dependency specification in a "package.json" file.  By
@@ -177,6 +181,24 @@ test_go: $(STAMP_GO_TOOLCHAIN)
 	@$(GO) version
 	$(GO) run src/tellmewhereto.go
 
+.PHONY: helloctf
+HELLOCTF_OBJS =	helloctf.o
+HELLOCTF_CFLAGS =	-gdwarf-2 -m64 -std=c99 -D__EXTENSIONS__ \
+			-Wall -Wextra -Werror \
+			-Wno-unused-parameter \
+			-Isrc/
+HELLOCTF_OBJDIR =	tmp/helloctf.obj
+
+helloctf: $(HELLOCTF_OBJS:%=$(HELLOCTF_OBJDIR)/%) | $(STAMP_CTF_TOOLS)
+	gcc -o $@ $^ $(HELLOCTF_CFLAGS)
+	$(CTFCONVERT) -l $@ $@
+
+$(HELLOCTF_OBJDIR)/%.o: src/%.c
+	@mkdir -p $(@D)
+	gcc -o $@ -c $(HELLOCTF_CFLAGS) $<
+
+CLEAN_FILES += tmp/helloctf.obj helloctf
+
 #
 # Target definitions.  This is where we include the target Makefiles for
 # the "defs" Makefiles we included above.
@@ -198,4 +220,5 @@ include tools/mk/Makefile.manpages.targ
 
 include ./tools/mk/Makefile.smf.targ
 include ./tools/mk/Makefile.node_modules.targ
+include ./tools/mk/Makefile.ctf.targ
 include ./tools/mk/Makefile.targ

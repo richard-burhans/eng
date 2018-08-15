@@ -1,0 +1,22 @@
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+
+#
+# Copyright (c) 2018, Joyent, Inc.
+#
+
+#
+# We need to build some C software, and to make it debuggable we should
+# include CTF information.  Download the program used to download and deploy
+# the Manta CTF tools.
+#
+$(STAMP_CTF_TOOLS):
+	$(MAKE_STAMP_REMOVE)
+	rm -rf $(CTFTOOLS)
+	mkdir -p $(CTFTOOLS)
+	tools/download_ctftools $(CACHE_DIR)
+	touch $@
+	$(MAKE_STAMP_CREATE)

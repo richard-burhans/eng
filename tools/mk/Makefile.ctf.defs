@@ -1,0 +1,27 @@
+#
+# This Source Code Form is subject to the terms of the Mozilla Public
+# License, v. 2.0. If a copy of the MPL was not distributed with this
+# file, You can obtain one at http://mozilla.org/MPL/2.0/.
+#
+
+#
+# Copyright (c) 2018, Joyent, Inc.
+#
+
+ifndef TOP
+$(error You must include Makefile.defs before this makefile.)
+endif
+
+ifndef CACHE_DIR
+$(error You must include Makefile.defs before this makefile.)
+endif
+
+CTFTOOLS := $(TOP)/$(CACHE_DIR)/ctftools
+CTFCONVERT := $(CTFTOOLS)/bin/ctfconvert
+
+STAMP_CTF_TOOLS :=	$(MAKE_STAMPS_DIR)/ctftools.stamp
+
+#
+# A regular make clean should remove any remnants of ctftools.
+#
+CLEAN_FILES += $(CTFTOOLS) $(CACHE_DIR)/ctftools*.tar.gz
